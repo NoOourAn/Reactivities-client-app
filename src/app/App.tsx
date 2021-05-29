@@ -4,11 +4,13 @@ import { Container, List } from "semantic-ui-react";
 import { Activity } from "./models/activity";
 import NavBar from "./NavBar";
 import ActivityDashboard from "../features/activities/dashboard/ActivityDashboard";
+import { v4 as uuid } from 'uuid';
 
 function App() {
   const [activities, setActivities] = useState<Activity[]>([]); //[] is initial state for activities value
-  const [selectedActivity, setSelectedActivity] =
-    useState<Activity | undefined>(undefined);
+
+  const [selectedActivity, setSelectedActivity] = useState<Activity | undefined>(undefined);
+
   const [EditCreateMode, setEditCreateMode] = useState(false); //we do not need to define type of EditCreateMode as boolean
 
   useEffect(() => {
@@ -37,6 +39,19 @@ function App() {
     setEditCreateMode(false);
   }
 
+  function handleCreateOrEditActivity(activity:Activity){
+    activity.id 
+    ? setActivities([...activities.filter(a => a.id !== activity.id), activity]) ///Edit Mode
+    : setActivities([...activities , {...activity , id: uuid()}])  ///Create Mode
+    setEditCreateMode(false)
+    setSelectedActivity(activity)
+  }
+
+  function handleDeleteActivity(id:string){
+    setActivities([...activities.filter(a => a.id !== id)]);
+    selectedActivity?.id === id && setSelectedActivity(undefined)
+  }
+
   return (
     <Fragment>
       <NavBar FormOpen={handleFormOpen} />
@@ -49,6 +64,8 @@ function App() {
           editCreateMode={EditCreateMode}
           handleFormOpen={handleFormOpen}
           handleFormClose={handleFormClose}
+          handleCreateOrEditActivity = {handleCreateOrEditActivity}
+          handleDeleteActivity = {handleDeleteActivity}
         />
       </Container>
     </Fragment>
